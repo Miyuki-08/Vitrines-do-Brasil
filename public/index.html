@@ -86,18 +86,37 @@
         const data = document.getElementById('data').value;
         const hora = document.getElementById('hora').value;
 
-        const res = await fetch('/agendar', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ nome, telefone, data, hora })
-        });
+        // const res = await fetch('/agendar', {
+        //     method: 'POST',
+        //     headers: {
+        //     'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({ nome, telefone, data, hora })
+        // });
 
-        const dataRes = await res.json();
-        document.getElementById('resposta').innerText =
-            dataRes.erro || dataRes.sucesso;
-        }
+        
+        const resposta = await fetch('/agendar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(dados)
+});
+
+const texto = await resposta.text(); // 👈 primeiro texto
+
+console.log(texto); // debug
+
+let dadosResposta;
+
+try {
+    dadosResposta = JSON.parse(texto);
+} catch (e) {
+    console.error("Resposta não é JSON:", texto);
+}
+
+    const dataRes = await res.json();
+    document.getElementById('resposta').innerText =
+        dataRes.erro || dataRes.sucesso;
+    }
         </script>
     <body>
         
