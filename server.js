@@ -11,11 +11,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost', // depois vamos trocar pro Supabase
-  database: 'agencia',
-  password: '123456',
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 const horariosValidos = ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
