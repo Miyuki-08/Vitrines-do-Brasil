@@ -36,7 +36,7 @@
                 
             if (!data) return;
 
-            const res = await fetch(`http://localhost:3000/horarios/${data}`);
+            const res = await fetch(`/horarios/${data}`);
             const dados = await res.json();
                 console.log(dados);
             const ocupados = dados.ocupados;
@@ -86,7 +86,7 @@
         const data = document.getElementById('data').value;
         const hora = document.getElementById('hora').value;
 
-        const res = await fetch('http://localhost:3000/agendar', {
+        const res = await fetch('/agendar', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json'
