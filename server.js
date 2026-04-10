@@ -1,6 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 app.use(cors());
@@ -85,6 +86,6 @@ app.get('/horarios/:data', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('Servidor rodando na porta 3000');
+app.listen(PORT, () => {
+  console.log('Servidor rodando');
 });
