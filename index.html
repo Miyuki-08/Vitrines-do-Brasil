@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Agendamentos</title>
+    </head>
+        <h2>Agendar horário</h2>
+
+        <input id="nome" placeholder="Nome"><br><br>
+        <input id="telefone" placeholder="Telefone"><br><br>
+        <input type="date" id="data" onchange="carregarHorarios()"><br><br> 
+        <!-- <select id="hora">
+            <option value="10:00">10:00</option>
+            <option value="12:00">12:00</option>
+            <option value="14:00">14:00</option>
+            <option value="16:00">16:00</option>
+            <option value="18:00">18:00</option>
+            <option value="20:00">20:00</option>
+        </select> -->
+
+        <select id="hora"></select>
+
+        <button onclick="agendar()">Agendar</button>
+
+        <p id="resposta"></p>
+
+        <script>
+            const horariosFixos = ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
+            
+            async function carregarHorarios() {
+                console.log("função chamada");
+                const data = document.getElementById('data').value;
+                console.log("data:", data);
+                
+                
+            if (!data) return;
+
+            const res = await fetch(`http://localhost:3000/horarios/${data}`);
+            const dados = await res.json();
+                console.log(dados);
+            const ocupados = dados.ocupados;
+
+            const select = document.getElementById('hora');
+            select.innerHTML = '';
+
+            const livres = horariosFixos.filter(h => !ocupados.includes(h));
+
+            livres.forEach(hora => {
+                const option = document.createElement('option');
+                option.value = hora;
+                option.textContent = hora;
+                select.appendChild(option);
+            });
+
+            if (livres.length === 0) {
+                const option = document.createElement('option');
+                option.textContent = 'Sem horários disponíveis';
+                select.appendChild(option);
+            }
+            }
+
+
+            const hoje = new Date();
+
+            // amanhã
+            const amanha = new Date();
+            amanha.setDate(hoje.getDate() + 1);
+
+            // +10 dias
+            const limite = new Date();
+            limite.setDate(hoje.getDate() + 10);
+
+            // formatar YYYY-MM-DD
+            function formatarData(data) {
+            return data.toISOString().split('T')[0];
+            }
+
+            document.getElementById('data').min = formatarData(amanha);
+            document.getElementById('data').max = formatarData(limite);
+
+
+        async function agendar() {
+        const nome = document.getElementById('nome').value;
+        const telefone = document.getElementById('telefone').value;
+        const data = document.getElementById('data').value;
+        const hora = document.getElementById('hora').value;
+
+        const res = await fetch('http://localhost:3000/agendar', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nome, telefone, data, hora })
+        });
+
+        const dataRes = await res.json();
+        document.getElementById('resposta').innerText =
+            dataRes.erro || dataRes.sucesso;
+        }
+        </script>
+    <body>
+        
+    </body>
+</html>
