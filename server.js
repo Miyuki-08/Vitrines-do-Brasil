@@ -1,52 +1,54 @@
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
-const PORT = process.env.PORT || 3000;
 const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// servir frontend
+app.use(express.static(path.join(__dirname, 'public')));
+
 const pool = new Pool({
   user: 'postgres',
-  host: 'localhost',
+  host: 'localhost', // depois vamos trocar pro Supabase
   database: 'agencia',
   password: '123456',
   port: 5432,
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+const horariosValidos = ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
+
+// rota inicial
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const horariosValidos = ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
-
-// 🔥 ROTA DE AGENDAMENTO
+// criar agendamento
 app.post('/agendar', async (req, res) => {
   const { nome, telefone, data, hora } = req.body;
 
-  // ✅ validar horário
-  if (!horariosValidos.includes(hora)) {
-    return res.json({ erro: 'Horário inválido' });
-  }
-
-  // ✅ validar data (amanhã até +10 dias)
-  const hoje = new Date();
-  const dataEscolhida = new Date(data);
-
-  const amanha = new Date();
-  amanha.setDate(hoje.getDate() + 1);
-
-  const limite = new Date();
-  limite.setDate(hoje.getDate() + 10);
-
-  if (dataEscolhida < amanha || dataEscolhida > limite) {
-    return res.json({ erro: 'Data fora do permitido' });
-  }
-
   try {
+    // valida horário
+    if (!horariosValidos.includes(hora)) {
+      return res.json({ erro: 'Horário inválido' });
+    }
+
+    // valida data
+    const hoje = new Date();
+    const dataEscolhida = new Date(data);
+
+    const amanha = new Date();
+    amanha.setDate(hoje.getDate() + 1);
+
+    const limite = new Date();
+    limite.setDate(hoje.getDate() + 10);
+
+    if (dataEscolhida < amanha || dataEscolhida > limite) {
+      return res.json({ erro: 'Data fora do permitido' });
+    }
+
     // verifica se já existe
     const check = await pool.query(
       'SELECT * FROM agendamentos WHERE data=$1 AND hora=$2',
@@ -71,7 +73,7 @@ app.post('/agendar', async (req, res) => {
   }
 });
 
-// 🔥 ROTA DE HORÁRIOS
+// horários ocupados
 app.get('/horarios/:data', async (req, res) => {
   const { data } = req.params;
 
@@ -81,8 +83,7 @@ app.get('/horarios/:data', async (req, res) => {
       [data]
     );
 
-    // ajustar formato da hora
-    const ocupados = result.rows.map(r => r.hora.toString().substring(0,5));
+    const ocupados = result.rows.map(r => r.hora);
 
     res.json({ ocupados });
 
@@ -92,6 +93,7 @@ app.get('/horarios/:data', async (req, res) => {
   }
 });
 
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Servidor rodando');
 });
