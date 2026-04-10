@@ -2,6 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 const PORT = process.env.PORT || 3000;
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -13,6 +14,11 @@ const pool = new Pool({
   database: 'agencia',
   password: '123456',
   port: 5432,
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const horariosValidos = ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
