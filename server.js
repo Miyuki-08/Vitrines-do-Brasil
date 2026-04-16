@@ -14,7 +14,8 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
-  }
+  },
+  family: 4 // 👈 ISSO AQUI resolve
 });
 
 const horariosValidos = ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
