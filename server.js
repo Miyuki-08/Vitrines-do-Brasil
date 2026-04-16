@@ -88,11 +88,11 @@ app.get('/horarios/:data', async (req, res) => {
 
     const ocupados = result.rows.map(r => r.hora);
 
-    res.json({ ocupados });
+    return res.json({ ocupados });
 
   } catch (err) {
     console.error(err);
-    res.status(500).send('Erro');
+    res.status(500).send({ erro: err.message });
   }
 });
 
